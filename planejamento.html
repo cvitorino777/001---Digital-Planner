@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Planner - Planejamento</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="planejamento.css" />
+  </head>
+  <body class="pagina-planejamento">
+    <header class="cabecalho-planejamento">
+      <h1>Planejamento semanal</h1>
+      <p class="dica">Clique e arraste na coluna de um dia pra criar um evento.</p>
+    </header>
+
+    <div class="barra-contadores">
+      <div class="contador">
+        <span class="numero" id="numero-pendentes">0</span>
+        <span class="rotulo">Pendentes</span>
+      </div>
+      <div class="contador">
+        <span class="numero" id="numero-hoje">0</span>
+        <span class="rotulo">Hoje</span>
+      </div>
+      <div class="contador">
+        <span class="numero" id="numero-concluidos">0</span>
+        <span class="rotulo">Concluídos</span>
+      </div>
+    </div>
+
+    <div class="legenda-categorias">
+      <span class="item-legenda"><i style="background:#378ADD"></i>Trabalho</span>
+      <span class="item-legenda"><i style="background:#7F77DD"></i>Faculdade</span>
+      <span class="item-legenda"><i style="background:#D4537E"></i>Música</span>
+      <span class="item-legenda"><i style="background:#639922"></i>Pessoal</span>
+      <span class="item-legenda"><i style="background:#D85A30"></i>Outro</span>
+    </div>
+
+    <div class="grid-wrapper">
+      <table class="grid-semana" id="grid-semana">
+        <thead>
+          <tr>
+            <th class="coluna-hora"></th>
+            <th data-day="dom">Dom 26</th>
+            <th data-day="seg">Seg 27</th>
+            <th data-day="ter">Ter 28</th>
+            <th data-day="qua">Qua 29</th>
+            <th data-day="qui">Qui 30</th>
+            <th data-day="sex">Sex 31</th>
+            <th data-day="sab">Sáb 1</th>
+          </tr>
+        </thead>
+        <tbody id="corpo-grid">
+          <!-- As linhas de horário são geradas pelo JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="barra-flutuante" id="barra-flutuante">
+      <button id="botao-concluir">Concluir</button>
+      <button id="botao-copiar">Copiar</button>
+      <button id="botao-excluir">Excluir</button>
+    </div>
+
+    <script src="planejamento.js"></script>
+  </body>
+</html>

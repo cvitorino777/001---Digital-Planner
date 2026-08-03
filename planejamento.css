@@ -1,0 +1,158 @@
+.pagina-planejamento {
+  min-height: 100vh;
+  background-color: #f4f1ea;
+  padding: 24px;
+}
+
+.cabecalho-planejamento {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.cabecalho-planejamento h1 {
+  color: #2c2c2a;
+}
+
+.dica {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.barra-contadores {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.contador {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 10px 20px;
+  text-align: center;
+  min-width: 90px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.contador .numero {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #1f3b57;
+}
+
+.contador .rotulo {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.slot.evento.concluido {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+.legenda-categorias {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 16px;
+  font-size: 0.8rem;
+  color: #444;
+}
+
+.item-legenda {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.item-legenda i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.grid-wrapper {
+  overflow-x: auto;
+}
+
+.grid-semana {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 700px;
+  background-color: #ffffff;
+  user-select: none; /* impede selecionar texto sem querer ao arrastar */
+}
+
+.grid-semana th,
+.grid-semana td {
+  border: 1px solid #ddd;
+  text-align: center;
+  height: 32px;
+}
+
+.grid-semana thead th {
+  background-color: #1f3b57;
+  color: #fff;
+  padding: 8px 4px;
+}
+
+.coluna-hora {
+  width: 60px;
+  background-color: #f0eee6;
+}
+
+.celula-hora {
+  background-color: #f0eee6;
+  font-size: 0.75rem;
+  color: #555;
+}
+
+.slot {
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+
+.slot:hover {
+  background-color: #eef2f6;
+}
+
+.slot.selecionando {
+  background-color: #cfe0f0;
+}
+
+.slot.evento {
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.slot.evento.marcado {
+  outline: 2px solid #1f3b57;
+  outline-offset: -2px;
+}
+
+.barra-flutuante {
+  display: none;
+  position: fixed;
+  background: #1f3b57;
+  border-radius: 8px;
+  padding: 6px;
+  gap: 6px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.barra-flutuante.visivel {
+  display: flex;
+}
+
+.barra-flutuante button {
+  background: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
