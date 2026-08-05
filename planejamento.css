@@ -6,7 +6,7 @@
 
 .cabecalho-planejamento {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .cabecalho-planejamento h1 {
@@ -14,15 +14,17 @@
 }
 
 .dica {
+  text-align: center;
   color: #666;
   font-size: 0.9rem;
+  margin: 8px 0 12px;
 }
 
 .barra-contadores {
   display: flex;
   justify-content: center;
   gap: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .contador {
@@ -46,17 +48,12 @@
   color: #666;
 }
 
-.slot.evento.concluido {
-  opacity: 0.55;
-  text-decoration: line-through;
-}
-
 .legenda-categorias {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
   gap: 14px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   font-size: 0.8rem;
   color: #444;
 }
@@ -74,16 +71,72 @@
   display: inline-block;
 }
 
+/* --- Barra de visualização --- */
+.barra-visualizacao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  max-width: 900px;
+  margin: 0 auto 4px;
+}
+
+.navegacao {
+  display: flex;
+  gap: 6px;
+}
+
+.navegacao button,
+.seletor-visualizacao button {
+  border: 1px solid #ccc;
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #2c2c2a;
+}
+
+.navegacao button:hover,
+.seletor-visualizacao button:hover {
+  background: #eef2f6;
+}
+
+.seletor-visualizacao {
+  display: flex;
+  gap: 4px;
+}
+
+.seletor-visualizacao button.ativo {
+  background: #1f3b57;
+  color: #fff;
+  border-color: #1f3b57;
+}
+
+#titulo-periodo {
+  color: #1f3b57;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.oculto {
+  display: none;
+}
+
+/* --- Grid dia/semana --- */
 .grid-wrapper {
   overflow-x: auto;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .grid-semana {
   border-collapse: collapse;
   width: 100%;
-  min-width: 700px;
+  min-width: 400px;
   background-color: #ffffff;
-  user-select: none; /* impede selecionar texto sem querer ao arrastar */
+  user-select: none;
 }
 
 .grid-semana th,
@@ -97,6 +150,11 @@
   background-color: #1f3b57;
   color: #fff;
   padding: 8px 4px;
+  font-size: 0.85rem;
+}
+
+.grid-semana thead th.coluna-hoje {
+  background-color: #0f2338;
 }
 
 .coluna-hora {
@@ -134,6 +192,108 @@
   outline-offset: -2px;
 }
 
+.slot.evento.concluido {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+/* --- Visão mês --- */
+.area-mes {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.grade-mes {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.rotulo-dia-semana {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #666;
+  padding-bottom: 4px;
+}
+
+.dia-mes {
+  background: #ffffff;
+  border-radius: 6px;
+  min-height: 64px;
+  padding: 6px;
+  cursor: pointer;
+  border: 1px solid #e5e2d9;
+}
+
+.dia-mes:hover {
+  border-color: #1f3b57;
+}
+
+.dia-mes.fora-do-mes {
+  opacity: 0.35;
+}
+
+.dia-mes.hoje {
+  border: 2px solid #1f3b57;
+}
+
+.dia-mes .numero-dia {
+  font-size: 0.8rem;
+  color: #2c2c2a;
+  font-weight: 500;
+}
+
+.dia-mes .badge-eventos {
+  margin-top: 6px;
+  display: inline-block;
+  background: #1f3b57;
+  color: #fff;
+  font-size: 0.65rem;
+  border-radius: 10px;
+  padding: 1px 6px;
+}
+
+/* --- Visão ano --- */
+.area-ano {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.grade-ano {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.mes-card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 14px;
+  text-align: center;
+  cursor: pointer;
+  border: 1px solid #e5e2d9;
+}
+
+.mes-card:hover {
+  border-color: #1f3b57;
+}
+
+.mes-card.mes-atual {
+  border: 2px solid #1f3b57;
+}
+
+.mes-card .nome-mes {
+  font-weight: 500;
+  color: #2c2c2a;
+  margin-bottom: 4px;
+}
+
+.mes-card .contagem-mes {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+/* --- Barra flutuante de ações --- */
 .barra-flutuante {
   display: none;
   position: fixed;
