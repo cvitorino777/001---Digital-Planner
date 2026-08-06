@@ -714,8 +714,21 @@
   }
 
   .sidebar {
-    width: 100%;
-    height: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 64px;
+    z-index: 20;
+    flex-shrink: 0;
+    background-color: var(--cor-superficie);
+    border-right: 1px solid var(--cor-superficie-clara);
+    padding: 20px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    overflow: hidden;
+    transition: width 0.2s ease;
   }
 
   h1 {
