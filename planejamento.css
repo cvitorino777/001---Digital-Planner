@@ -687,3 +687,55 @@
   color: var(--cor-fundo);
   font-weight: 600;
 }
+
+/* ========================= */
+/* RESPONSIVO - CELULAR */
+/* ========================= */
+
+@media screen and (max-width: 768px) {
+
+  body {
+    padding: 10px;
+  }
+
+  .container {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .cards {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .card {
+    width: 100%;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+  }
+
+  p {
+    font-size: 0.95rem;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
