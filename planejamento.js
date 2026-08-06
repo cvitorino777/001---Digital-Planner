@@ -9,8 +9,6 @@ const NOMES_MES = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
 ];
-const CHAVE_STORAGE = "planner-eventos-todos";
-
 // --- Categorias fixas ---
 const CATEGORIAS = {
   1: { id: "trabalho", nome: "Trabalho", cor: "#378ADD" },
@@ -19,14 +17,6 @@ const CATEGORIAS = {
   4: { id: "pessoal", nome: "Pessoal", cor: "#639922" },
   5: { id: "outro", nome: "Outro", cor: "#D85A30" },
 };
-
-function perguntarCategoria() {
-  const opcoes = Object.entries(CATEGORIAS)
-    .map(([numero, cat]) => `${numero} - ${cat.nome}`)
-    .join("\n");
-  const escolha = prompt(`Categoria:\n${opcoes}`, "1");
-  return CATEGORIAS[escolha] || CATEGORIAS[5];
-}
 
 // --- Utilidades de data ---
 function normalizarData(data) {
@@ -58,7 +48,35 @@ function mesmaData(a, b) {
   return formatarISO(a) === formatarISO(b);
 }
 
+// --- Planners (listas separadas de eventos) ---
+function carregarListaPlanners() {
+  const salvo = localStorage.getItem("planner-lista");
+  if (salvo) return JSON.parse(salvo);
+  const padrao = [{ id: "daily", nome: "Daily" }];
+  localStorage.setItem("planner-lista", JSON.stringify(padrao));
+  return padrao;
+}
+
+function salvarListaPlanners() {
+  localStorage.setItem("planner-lista", JSON.stringify(listaPlanners));
+}
+
+function chaveEventosDoPlanner(id) {
+  return `planner-eventos-${id}`;
+}
+
+function migrarEventosAntigos() {
+  const antigos = localStorage.getItem("planner-eventos-todos");
+  const chaveDaily = chaveEventosDoPlanner("daily");
+  if (antigos && !localStorage.getItem(chaveDaily)) {
+    localStorage.setItem(chaveDaily, antigos);
+  }
+}
+
 // --- Estado em memória ---
+let listaPlanners = carregarListaPlanners();
+migrarEventosAntigos();
+let plannerAtivoId = localStorage.getItem("planner-ativo") || listaPlanners[0].id;
 let eventos = carregarEventos(); // { "2026-08-01-3": { texto, categoriaId, cor, grupoId, primeira, feita }, ... }
 let visualizacao = "semana"; // dia | semana | mes | ano
 let dataReferencia = normalizarData(new Date());
@@ -69,15 +87,16 @@ let inicioSelecao = null;
 let fimSelecao = null;
 let grupoMarcado = null;
 let areaTransferencia = null;
+let selecaoPendente = null;
 
 // --- Armazenamento local ---
 function carregarEventos() {
-  const salvo = localStorage.getItem(CHAVE_STORAGE);
+  const salvo = localStorage.getItem(chaveEventosDoPlanner(plannerAtivoId));
   return salvo ? JSON.parse(salvo) : {};
 }
 
 function salvarEventos() {
-  localStorage.setItem(CHAVE_STORAGE, JSON.stringify(eventos));
+  localStorage.setItem(chaveEventosDoPlanner(plannerAtivoId), JSON.stringify(eventos));
 }
 
 // --- Criar / colar evento ---
@@ -148,13 +167,13 @@ function renderizarEventosNoGrid() {
     const evento = eventos[chave];
 
     celula.classList.remove("evento", "marcado", "concluido");
-    celula.style.backgroundColor = "";
+    celula.style.removeProperty("--cor-evento");
     celula.textContent = "";
 
     if (evento) {
       celula.classList.add("evento");
       if (evento.feita) celula.classList.add("concluido");
-      celula.style.backgroundColor = evento.cor;
+      celula.style.setProperty("--cor-evento", evento.cor);
       if (evento.grupoId === grupoMarcado) celula.classList.add("marcado");
       if (evento.primeira) celula.textContent = evento.texto;
     }
@@ -187,19 +206,77 @@ function destacarSelecao() {
   });
 }
 
+let categoriaSelecionadaId = 1;
+
 function finalizarSelecao() {
   if (!selecionando) return;
   selecionando = false;
 
   const [de, ate] = [inicioSelecao, fimSelecao].sort((a, b) => a - b);
-  document.querySelectorAll(".slot.selecionando").forEach((c) => c.classList.remove("selecionando"));
+  const celulaFinal = document.querySelector(
+    `.slot[data-date="${dataSelecao}"][data-hora="${ate}"]`
+  );
 
-  const texto = prompt("Nome do evento:");
-  if (texto && texto.trim()) {
-    const categoria = perguntarCategoria();
-    const [ano, mes, dia] = dataSelecao.split("-").map(Number);
-    criarEvento(new Date(ano, mes - 1, dia), de, ate - de + 1, texto.trim(), categoria);
+  selecaoPendente = { dataSelecao, de, ate };
+  abrirModalEvento(celulaFinal);
+}
+
+function montarOpcoesCategoria() {
+  const container = document.getElementById("opcoes-categoria");
+  container.innerHTML = "";
+  Object.entries(CATEGORIAS).forEach(([numero, cat]) => {
+    const opcao = document.createElement("button");
+    opcao.type = "button";
+    opcao.className = "opcao-categoria" + (Number(numero) === categoriaSelecionadaId ? " selecionada" : "");
+    opcao.dataset.numero = numero;
+    opcao.innerHTML = `<i style="background:${cat.cor}"></i>${cat.nome}`;
+    opcao.addEventListener("click", () => {
+      categoriaSelecionadaId = Number(numero);
+      container.querySelectorAll(".opcao-categoria").forEach((el) => el.classList.remove("selecionada"));
+      opcao.classList.add("selecionada");
+    });
+    container.appendChild(opcao);
+  });
+}
+
+function abrirModalEvento(celulaReferencia) {
+  const modal = document.getElementById("modal-evento");
+  const input = document.getElementById("input-nome-evento");
+
+  montarOpcoesCategoria();
+  modal.classList.remove("oculto");
+
+  const posicao = celulaReferencia.getBoundingClientRect();
+  const espacoAbaixo = window.innerHeight - posicao.bottom;
+  if (espacoAbaixo > 180) {
+    modal.style.top = `${posicao.bottom + 6}px`;
+  } else {
+    modal.style.top = `${posicao.top - 190}px`;
   }
+  let esquerda = posicao.left;
+  if (esquerda + 230 > window.innerWidth) esquerda = window.innerWidth - 236;
+  modal.style.left = `${esquerda}px`;
+
+  input.value = "";
+  input.focus();
+}
+
+function fecharModalEvento() {
+  document.getElementById("modal-evento").classList.add("oculto");
+  document.querySelectorAll(".slot.selecionando").forEach((c) => c.classList.remove("selecionando"));
+  selecaoPendente = null;
+}
+
+function confirmarCriacaoEvento() {
+  if (!selecaoPendente) return;
+  const texto = document.getElementById("input-nome-evento").value.trim();
+  if (!texto) return;
+
+  const { dataSelecao, de, ate } = selecaoPendente;
+  const [ano, mes, dia] = dataSelecao.split("-").map(Number);
+  const categoria = CATEGORIAS[categoriaSelecionadaId];
+  criarEvento(new Date(ano, mes - 1, dia), de, ate - de + 1, texto, categoria);
+  fecharModalEvento();
 }
 
 function marcarEvento(celula) {
@@ -429,6 +506,14 @@ function atualizarContadores() {
 // ==================================================
 // TÍTULO DO PERÍODO
 // ==================================================
+function atualizarSaudacao() {
+  const hora = new Date().getHours();
+  const titulo = document.getElementById("titulo-saudacao");
+  if (hora >= 5 && hora < 12) titulo.textContent = "Bom dia!";
+  else if (hora >= 12 && hora < 18) titulo.textContent = "Boa tarde!";
+  else titulo.textContent = "Boa noite!";
+}
+
 function atualizarTitulo() {
   const titulo = document.getElementById("titulo-periodo");
   if (visualizacao === "dia") {
@@ -492,16 +577,112 @@ function atualizarVisualizacao() {
   atualizarContadores();
 }
 
+// --- Gerenciamento de planners ---
+function renderizarListaPlanners() {
+  const container = document.getElementById("lista-planners");
+  container.innerHTML = "";
+  listaPlanners.forEach((planner) => {
+    const item = document.createElement("button");
+    item.className = "nav-item" + (planner.id === plannerAtivoId ? " ativo" : "");
+    item.innerHTML = `<span class="nav-icone">●</span> <span class="nav-texto">${planner.nome}</span>`;
+    item.addEventListener("click", () => trocarPlanner(planner.id));
+    container.appendChild(item);
+  });
+}
+
+function trocarPlanner(id) {
+  if (id === plannerAtivoId) return;
+  plannerAtivoId = id;
+  localStorage.setItem("planner-ativo", id);
+  eventos = carregarEventos();
+  renderizarListaPlanners();
+  atualizarVisualizacao();
+}
+
+function criarPlanner(nome) {
+  const id = `${nome.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${Date.now()}`;
+  listaPlanners.push({ id, nome });
+  salvarListaPlanners();
+  trocarPlanner(id);
+}
+
+// --- Busca de eventos ---
+function buscarEventos(termo) {
+  const container = document.getElementById("resultados-busca");
+  if (!termo.trim()) {
+    container.classList.add("oculto");
+    return;
+  }
+
+  const grupos = {};
+  Object.entries(eventos).forEach(([chave, evento]) => {
+    if (!grupos[evento.grupoId]) grupos[evento.grupoId] = { ...evento, chave };
+  });
+
+  const termoBusca = termo.trim().toLowerCase();
+  const resultados = Object.values(grupos)
+    .filter((e) => e.texto.toLowerCase().includes(termoBusca))
+    .slice(0, 8);
+
+  container.innerHTML = "";
+  if (resultados.length === 0) {
+    container.innerHTML = `<div class="resultado-busca-vazio">Nenhum evento encontrado</div>`;
+  } else {
+    resultados.forEach((resultado) => {
+      const [ano, mes, dia] = resultado.chave.split("-").map(Number);
+      const data = new Date(ano, mes - 1, dia);
+      const item = document.createElement("div");
+      item.className = "resultado-busca";
+      item.innerHTML = `<span>${resultado.texto}</span><span class="data-resultado">${dia}/${mes}</span>`;
+      item.addEventListener("click", () => {
+        dataReferencia = normalizarData(data);
+        visualizacao = "dia";
+        document.querySelectorAll("#seletor-visualizacao button").forEach((b) => b.classList.remove("ativo"));
+        document.querySelector('#seletor-visualizacao button[data-visao="dia"]').classList.add("ativo");
+        grupoMarcado = resultado.grupoId;
+        atualizarVisualizacao();
+        container.classList.add("oculto");
+        document.getElementById("input-busca").value = "";
+      });
+      container.appendChild(item);
+    });
+  }
+  container.classList.remove("oculto");
+}
+
 // --- Inicialização ---
 configurarEventosDoGrid();
+renderizarListaPlanners();
 atualizarVisualizacao();
+atualizarSaudacao();
 
-document.querySelectorAll(".nav-item").forEach((item) => {
-  item.addEventListener("click", () => {
-    document.querySelectorAll(".nav-item").forEach((i) => i.classList.remove("ativo"));
-    item.classList.add("ativo");
-    // Por enquanto só "Daily" tem conteúdo; as outras entram nas próximas etapas
-  });
+document.getElementById("input-busca").addEventListener("input", (ev) => {
+  buscarEventos(ev.target.value);
+});
+
+document.addEventListener("click", (ev) => {
+  if (!ev.target.closest(".busca-superior")) {
+    document.getElementById("resultados-busca").classList.add("oculto");
+  }
+});
+
+document.getElementById("botao-criar-planner").addEventListener("click", () => {
+  const form = document.getElementById("form-criar-planner");
+  const input = document.getElementById("input-novo-planner");
+  form.classList.remove("oculto");
+  input.value = "";
+  input.focus();
+});
+
+document.getElementById("input-novo-planner").addEventListener("keydown", (ev) => {
+  if (ev.key === "Enter") {
+    const nome = ev.target.value.trim();
+    if (nome) criarPlanner(nome);
+    document.getElementById("form-criar-planner").classList.add("oculto");
+  }
+  if (ev.key === "Escape") {
+    document.getElementById("form-criar-planner").classList.add("oculto");
+  }
 });
 
 document.getElementById("botao-copiar").addEventListener("click", copiarEventoMarcado);
@@ -518,4 +699,12 @@ document.getElementById("botao-hoje").addEventListener("click", () => {
 document.getElementById("seletor-visualizacao").addEventListener("click", (ev) => {
   const botao = ev.target.closest("button[data-visao]");
   if (botao) mudarVisualizacao(botao.dataset.visao);
+});
+
+document.getElementById("botao-criar-evento").addEventListener("click", confirmarCriacaoEvento);
+document.getElementById("botao-cancelar-evento").addEventListener("click", fecharModalEvento);
+
+document.getElementById("input-nome-evento").addEventListener("keydown", (ev) => {
+  if (ev.key === "Enter") confirmarCriacaoEvento();
+  if (ev.key === "Escape") fecharModalEvento();
 });

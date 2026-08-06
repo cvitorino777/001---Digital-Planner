@@ -14,28 +14,16 @@
           <span class="marca-nome">Meu Planner</span>
         </div>
 
-        <div class="perfil-sidebar">
-          <div class="avatar-placeholder">C</div>
-          <div class="perfil-info">
-            <span class="perfil-nome">Cesar</span>
-            <span class="perfil-sub">ProdC$R</span>
-          </div>
-        </div>
-
         <nav class="nav-sidebar">
-          <span class="nav-titulo">Menu</span>
-          <button class="nav-item ativo" data-categoria="daily">
-            <span class="nav-icone">●</span> <span class="nav-texto">Daily</span>
+          <span class="nav-titulo">Meus planners</span>
+          <div id="lista-planners"></div>
+
+          <button class="nav-item nav-criar" id="botao-criar-planner">
+            <span class="nav-icone">+</span> <span class="nav-texto">Criar planner</span>
           </button>
-          <button class="nav-item" data-categoria="planners">
-            <span class="nav-icone">●</span> <span class="nav-texto">Planners</span>
-          </button>
-          <button class="nav-item" data-categoria="pessoal">
-            <span class="nav-icone">●</span> <span class="nav-texto">Pessoal</span>
-          </button>
-          <button class="nav-item" data-categoria="metas">
-            <span class="nav-icone">●</span> <span class="nav-texto">Metas</span>
-          </button>
+          <div class="form-criar-planner oculto" id="form-criar-planner">
+            <input type="text" id="input-novo-planner" placeholder="Nome do planner" autocomplete="off" />
+          </div>
         </nav>
       </aside>
 
@@ -43,7 +31,8 @@
         <div class="barra-superior">
           <div class="busca-superior">
             <span class="icone-busca">⌕</span>
-            <input type="text" placeholder="Buscar evento..." disabled />
+            <input type="text" id="input-busca" placeholder="Buscar evento..." autocomplete="off" />
+            <div class="resultados-busca oculto" id="resultados-busca"></div>
           </div>
           <div class="perfil-superior">
             <div class="avatar-superior">C</div>
@@ -53,7 +42,7 @@
         </div>
 
         <header class="cabecalho-planejamento">
-          <h1>Planejamento</h1>
+          <h1 id="titulo-saudacao">Planejamento</h1>
         </header>
 
         <div class="barra-contadores">
@@ -116,6 +105,15 @@
       <button id="botao-concluir">Concluir</button>
       <button id="botao-copiar">Copiar</button>
       <button id="botao-excluir">Excluir</button>
+    </div>
+
+    <div class="modal-evento oculto" id="modal-evento">
+      <input type="text" id="input-nome-evento" placeholder="Nome do evento" autocomplete="off" />
+      <div class="opcoes-categoria" id="opcoes-categoria"></div>
+      <div class="modal-acoes">
+        <button id="botao-cancelar-evento">Cancelar</button>
+        <button id="botao-criar-evento">Criar</button>
+      </div>
     </div>
 
     <script src="planejamento.js"></script>

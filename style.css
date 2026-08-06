@@ -1,10 +1,10 @@
 :root {
-  --cor-fundo: #190019;
-  --cor-superficie: #2b124c;
-  --cor-superficie-clara: #522b5b;
-  --cor-texto-suave: #c9a8c4;
-  --cor-destaque: #dfb6b2;
-  --cor-texto-claro: #fbe4d8;
+  --cor-fundo: #f1bebe;
+  --cor-superficie: #ffffff;
+  --cor-superficie-clara: #d8d8d8;
+  --cor-texto-suave: #2c6478;
+  --cor-destaque: #ea9393;
+  --cor-texto-claro: #2c2c2a;
 }
 
 * {
