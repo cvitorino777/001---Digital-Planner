@@ -1,121 +1,125 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Planner - Planejamento</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="planejamento.css" />
-  </head>
-  <body class="pagina-planejamento">
-    <div class="layout-app">
-      <aside class="sidebar">
-        <div class="marca-sidebar">
-          <span class="marca-logo">P</span>
-          <span class="marca-nome">Meu Planner</span>
-        </div>
 
-        <nav class="nav-sidebar">
-          <span class="nav-titulo">Meus planners</span>
-          <div id="lista-planners"></div>
+<head>
+  <meta charset="UTF-8" />
+  <title>Planner - Planejamento</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="planejamento.css" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+</head>
 
-          <button class="nav-item nav-criar" id="botao-criar-planner">
-            <span class="nav-icone">+</span> <span class="nav-texto">Criar planner</span>
-          </button>
-          <div class="form-criar-planner oculto" id="form-criar-planner">
-            <input type="text" id="input-novo-planner" placeholder="Nome do planner" autocomplete="off" />
-          </div>
-        </nav>
-      </aside>
-
-      <main class="conteudo-principal">
-        <div class="barra-superior">
-          <div class="busca-superior">
-            <span class="icone-busca">⌕</span>
-            <input type="text" id="input-busca" placeholder="Buscar evento..." autocomplete="off" />
-            <div class="resultados-busca oculto" id="resultados-busca"></div>
-          </div>
-          <div class="perfil-superior">
-            <div class="avatar-superior">C</div>
-            <span class="nome-superior">Cesar</span>
-            <span class="seta-superior">▾</span>
-          </div>
-        </div>
-
-        <header class="cabecalho-planejamento">
-          <h1 id="titulo-saudacao">Planejamento</h1>
-        </header>
-
-        <div class="barra-contadores">
-          <div class="contador">
-            <span class="numero" id="numero-pendentes">0</span>
-            <span class="rotulo">Pendentes</span>
-          </div>
-          <div class="contador">
-            <span class="numero" id="numero-hoje">0</span>
-            <span class="rotulo">Hoje</span>
-          </div>
-          <div class="contador">
-            <span class="numero" id="numero-concluidos">0</span>
-            <span class="rotulo">Concluídos</span>
-          </div>
-        </div>
-
-        <div class="legenda-categorias">
-          <span class="item-legenda"><i style="background:#378ADD"></i>Trabalho</span>
-          <span class="item-legenda"><i style="background:#7F77DD"></i>Faculdade</span>
-          <span class="item-legenda"><i style="background:#D4537E"></i>Música</span>
-          <span class="item-legenda"><i style="background:#639922"></i>Pessoal</span>
-          <span class="item-legenda"><i style="background:#D85A30"></i>Outro</span>
-        </div>
-
-        <div class="barra-visualizacao">
-          <div class="navegacao">
-            <button id="botao-anterior" aria-label="Anterior">‹</button>
-            <button id="botao-hoje">Hoje</button>
-            <button id="botao-proximo" aria-label="Próximo">›</button>
-          </div>
-          <h2 id="titulo-periodo"></h2>
-          <div class="seletor-visualizacao" id="seletor-visualizacao">
-            <button data-visao="dia">Dia</button>
-            <button data-visao="semana" class="ativo">Semana</button>
-            <button data-visao="mes">Mês</button>
-            <button data-visao="ano">Ano</button>
-          </div>
-        </div>
-
-        <p class="dica" id="dica-interacao">Clique e arraste na coluna de um dia pra criar um evento.</p>
-
-        <div class="grid-wrapper" id="area-grid">
-          <table class="grid-semana" id="grid-semana">
-            <thead>
-              <tr id="linha-dias">
-                <th class="coluna-hora"></th>
-              </tr>
-            </thead>
-            <tbody id="corpo-grid"></tbody>
-          </table>
-        </div>
-
-        <div class="area-mes oculto" id="area-mes"></div>
-        <div class="area-ano oculto" id="area-ano"></div>
-      </main>
-    </div>
-
-    <div class="barra-flutuante" id="barra-flutuante">
-      <button id="botao-concluir">Concluir</button>
-      <button id="botao-copiar">Copiar</button>
-      <button id="botao-excluir">Excluir</button>
-    </div>
-
-    <div class="modal-evento oculto" id="modal-evento">
-      <input type="text" id="input-nome-evento" placeholder="Nome do evento" autocomplete="off" />
-      <div class="opcoes-categoria" id="opcoes-categoria"></div>
-      <div class="modal-acoes">
-        <button id="botao-cancelar-evento">Cancelar</button>
-        <button id="botao-criar-evento">Criar</button>
+<body class="pagina-planejamento">
+  <div class="layout-app">
+    <aside class="sidebar">
+      <div class="marca-sidebar">
+        <span class="marca-logo">P</span>
+        <span class="marca-nome">Meu Planner</span>
       </div>
-    </div>
 
-    <script src="planejamento.js"></script>
-  </body>
+      <nav class="nav-sidebar">
+        <span class="nav-titulo">Meus planners</span>
+        <div id="lista-planners"></div>
+
+        <button class="nav-item nav-criar" id="botao-criar-planner">
+          <span class="nav-icone">+</span> <span class="nav-texto">Criar planner</span>
+        </button>
+        <div class="form-criar-planner oculto" id="form-criar-planner">
+          <input type="text" id="input-novo-planner" placeholder="Nome do planner" autocomplete="off" />
+        </div>
+      </nav>
+    </aside>
+
+    <main class="conteudo-principal">
+      <div class="barra-superior">
+        <div class="busca-superior">
+          <span class="icone-busca">⌕</span>
+          <input type="text" id="input-busca" placeholder="Buscar evento..." autocomplete="off" />
+          <div class="resultados-busca oculto" id="resultados-busca"></div>
+        </div>
+        <div class="perfil-superior">
+          <div class="avatar-superior">C</div>
+          <span class="nome-superior">Cesar</span>
+          <span class="seta-superior">▾</span>
+        </div>
+      </div>
+
+      <header class="cabecalho-planejamento">
+        <h1 id="titulo-saudacao">Planejamento</h1>
+      </header>
+
+      <div class="barra-contadores">
+        <div class="contador">
+          <span class="numero" id="numero-pendentes">0</span>
+          <span class="rotulo">Pendentes</span>
+        </div>
+        <div class="contador">
+          <span class="numero" id="numero-hoje">0</span>
+          <span class="rotulo">Hoje</span>
+        </div>
+        <div class="contador">
+          <span class="numero" id="numero-concluidos">0</span>
+          <span class="rotulo">Concluídos</span>
+        </div>
+      </div>
+
+      <div class="legenda-categorias">
+        <span class="item-legenda"><i style="background:#378ADD"></i>Trabalho</span>
+        <span class="item-legenda"><i style="background:#7F77DD"></i>Faculdade</span>
+        <span class="item-legenda"><i style="background:#D4537E"></i>Música</span>
+        <span class="item-legenda"><i style="background:#639922"></i>Pessoal</span>
+        <span class="item-legenda"><i style="background:#D85A30"></i>Outro</span>
+      </div>
+
+      <div class="barra-visualizacao">
+        <div class="navegacao">
+          <button id="botao-anterior" aria-label="Anterior">‹</button>
+          <button id="botao-hoje">Hoje</button>
+          <button id="botao-proximo" aria-label="Próximo">›</button>
+        </div>
+        <h2 id="titulo-periodo"></h2>
+        <div class="seletor-visualizacao" id="seletor-visualizacao">
+          <button data-visao="dia">Dia</button>
+          <button data-visao="semana" class="ativo">Semana</button>
+          <button data-visao="mes">Mês</button>
+          <button data-visao="ano">Ano</button>
+        </div>
+      </div>
+
+      <p class="dica" id="dica-interacao">Clique e arraste na coluna de um dia pra criar um evento.</p>
+
+      <div class="grid-wrapper" id="area-grid">
+        <table class="grid-semana" id="grid-semana">
+          <thead>
+            <tr id="linha-dias">
+              <th class="coluna-hora"></th>
+            </tr>
+          </thead>
+          <tbody id="corpo-grid"></tbody>
+        </table>
+      </div>
+
+      <div class="area-mes oculto" id="area-mes"></div>
+      <div class="area-ano oculto" id="area-ano"></div>
+    </main>
+  </div>
+
+  <div class="barra-flutuante" id="barra-flutuante">
+    <button id="botao-concluir">Concluir</button>
+    <button id="botao-copiar">Copiar</button>
+    <button id="botao-excluir">Excluir</button>
+  </div>
+
+  <div class="modal-evento oculto" id="modal-evento">
+    <input type="text" id="input-nome-evento" placeholder="Nome do evento" autocomplete="off" />
+    <div class="opcoes-categoria" id="opcoes-categoria"></div>
+    <div class="modal-acoes">
+      <button id="botao-cancelar-evento">Cancelar</button>
+      <button id="botao-criar-evento">Criar</button>
+    </div>
+  </div>
+
+  <script src="planejamento.js"></script>
+</body>
+
 </html>
