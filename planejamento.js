@@ -496,6 +496,14 @@ function atualizarVisualizacao() {
 configurarEventosDoGrid();
 atualizarVisualizacao();
 
+document.querySelectorAll(".nav-item").forEach((item) => {
+  item.addEventListener("click", () => {
+    document.querySelectorAll(".nav-item").forEach((i) => i.classList.remove("ativo"));
+    item.classList.add("ativo");
+    // Por enquanto só "Daily" tem conteúdo; as outras entram nas próximas etapas
+  });
+});
+
 document.getElementById("botao-copiar").addEventListener("click", copiarEventoMarcado);
 document.getElementById("botao-excluir").addEventListener("click", excluirEventoMarcado);
 document.getElementById("botao-concluir").addEventListener("click", alternarConclusaoMarcado);

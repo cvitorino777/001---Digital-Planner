@@ -1,7 +1,238 @@
+:root {
+  --cor-fundo: #190019;
+  --cor-superficie: #2b124c;
+  --cor-superficie-clara: #522b5b;
+  --cor-texto-suave: #c9a8c4;
+  --cor-destaque: #dfb6b2;
+  --cor-texto-claro: #fbe4d8;
+}
+
 .pagina-planejamento {
   min-height: 100vh;
-  background-color: #f4f1ea;
-  padding: 24px;
+  background-color: var(--cor-fundo);
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.layout-app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.conteudo-principal {
+  flex: 1;
+  padding: 24px 32px;
+  margin-left: 64px;
+}
+
+/* --- Sidebar --- */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 64px;
+  z-index: 20;
+  flex-shrink: 0;
+  background-color: var(--cor-superficie);
+  border-right: 1px solid var(--cor-superficie-clara);
+  padding: 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  overflow: hidden;
+  transition: width 0.2s ease;
+}
+
+.sidebar:hover {
+  width: 220px;
+}
+
+.marca-nome,
+.perfil-info,
+.nav-titulo,
+.nav-texto {
+  opacity: 0;
+  white-space: nowrap;
+  transition: opacity 0.15s ease;
+}
+
+.sidebar:hover .marca-nome,
+.sidebar:hover .perfil-info,
+.sidebar:hover .nav-titulo,
+.sidebar:hover .nav-texto {
+  opacity: 1;
+}
+
+.marca-sidebar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.marca-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: var(--cor-destaque);
+  color: var(--cor-fundo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.marca-nome {
+  color: var(--cor-texto-claro);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.perfil-sidebar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: var(--cor-superficie-clara);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.avatar-placeholder {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--cor-destaque);
+  color: var(--cor-fundo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.perfil-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.perfil-nome {
+  color: var(--cor-texto-claro);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.perfil-sub {
+  color: var(--cor-texto-suave);
+  font-size: 0.75rem;
+}
+
+.nav-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-titulo {
+  color: var(--cor-texto-suave);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--cor-texto-suave);
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.nav-item:hover {
+  background-color: var(--cor-superficie-clara);
+  color: var(--cor-texto-claro);
+}
+
+.nav-item.ativo {
+  background-color: var(--cor-destaque);
+  color: var(--cor-fundo);
+  font-weight: 600;
+}
+
+.nav-icone {
+  font-size: 0.5rem;
+}
+
+/* --- Conteúdo principal --- */
+.barra-superior {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 900px;
+  margin: 0 auto 20px;
+}
+
+.busca-superior {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--cor-superficie);
+  border: 1px solid var(--cor-superficie-clara);
+  border-radius: 20px;
+  padding: 8px 16px;
+  color: var(--cor-texto-suave);
+  width: 220px;
+}
+
+.busca-superior input {
+  background: none;
+  border: none;
+  color: var(--cor-texto-claro);
+  font-size: 0.85rem;
+  width: 100%;
+}
+
+.busca-superior input::placeholder {
+  color: var(--cor-texto-suave);
+}
+
+.perfil-superior {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--cor-superficie);
+  border: 1px solid var(--cor-superficie-clara);
+  border-radius: 20px;
+  padding: 6px 14px 6px 6px;
+  cursor: pointer;
+}
+
+.avatar-superior {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: var(--cor-destaque);
+  color: var(--cor-fundo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.85rem;
+}
+
+.nome-superior {
+  color: var(--cor-texto-claro);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.seta-superior {
+  color: var(--cor-texto-suave);
+  font-size: 0.7rem;
 }
 
 .cabecalho-planejamento {
@@ -10,12 +241,12 @@
 }
 
 .cabecalho-planejamento h1 {
-  color: #2c2c2a;
+  color: var(--cor-texto-claro);
 }
 
 .dica {
   text-align: center;
-  color: #666;
+  color: var(--cor-texto-suave);
   font-size: 0.9rem;
   margin: 8px 0 12px;
 }
@@ -28,24 +259,24 @@
 }
 
 .contador {
-  background-color: #ffffff;
-  border-radius: 8px;
+  background-color: var(--cor-superficie);
+  border: 1px solid var(--cor-superficie-clara);
+  border-radius: 14px;
   padding: 10px 20px;
   text-align: center;
   min-width: 90px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 .contador .numero {
   display: block;
   font-size: 1.4rem;
   font-weight: bold;
-  color: #1f3b57;
+  color: var(--cor-texto-claro);
 }
 
 .contador .rotulo {
   font-size: 0.75rem;
-  color: #666;
+  color: var(--cor-texto-suave);
 }
 
 .legenda-categorias {
@@ -55,7 +286,7 @@
   gap: 14px;
   margin-bottom: 20px;
   font-size: 0.8rem;
-  color: #444;
+  color: var(--cor-texto-suave);
 }
 
 .item-legenda {
@@ -89,18 +320,19 @@
 
 .navegacao button,
 .seletor-visualizacao button {
-  border: 1px solid #ccc;
-  background: #ffffff;
+  border: 1px solid var(--cor-superficie-clara);
+  background: var(--cor-superficie);
   border-radius: 6px;
   padding: 6px 12px;
   cursor: pointer;
   font-size: 0.85rem;
-  color: #2c2c2a;
+  color: var(--cor-texto-suave);
 }
 
 .navegacao button:hover,
 .seletor-visualizacao button:hover {
-  background: #eef2f6;
+  border-color: var(--cor-destaque);
+  color: var(--cor-texto-claro);
 }
 
 .seletor-visualizacao {
@@ -109,13 +341,13 @@
 }
 
 .seletor-visualizacao button.ativo {
-  background: #1f3b57;
-  color: #fff;
-  border-color: #1f3b57;
+  background: var(--cor-superficie-clara);
+  color: var(--cor-texto-claro);
+  border-color: var(--cor-destaque);
 }
 
 #titulo-periodo {
-  color: #1f3b57;
+  color: var(--cor-texto-claro);
   font-size: 1.1rem;
   margin: 0;
 }
@@ -132,40 +364,46 @@
 }
 
 .grid-semana {
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 3px;
   width: 100%;
   min-width: 400px;
-  background-color: #ffffff;
+  background-color: transparent;
   user-select: none;
 }
 
 .grid-semana th,
 .grid-semana td {
-  border: 1px solid #ddd;
+  border: 1px solid var(--cor-superficie-clara);
+  border-radius: 8px;
   text-align: center;
   height: 32px;
+  color: var(--cor-texto-suave);
 }
 
 .grid-semana thead th {
-  background-color: #1f3b57;
-  color: #fff;
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto-claro);
   padding: 8px 4px;
   font-size: 0.85rem;
+  border-radius: 10px;
 }
 
 .grid-semana thead th.coluna-hoje {
-  background-color: #0f2338;
+  background-color: var(--cor-superficie-clara);
 }
 
 .coluna-hora {
   width: 60px;
-  background-color: #f0eee6;
+  background-color: var(--cor-fundo);
+  border-radius: 8px;
 }
 
 .celula-hora {
-  background-color: #f0eee6;
+  background-color: var(--cor-fundo);
   font-size: 0.75rem;
-  color: #555;
+  color: var(--cor-texto-suave);
+  border-radius: 8px;
 }
 
 .slot {
@@ -174,21 +412,21 @@
 }
 
 .slot:hover {
-  background-color: #eef2f6;
+  background-color: var(--cor-superficie-clara);
 }
 
 .slot.selecionando {
-  background-color: #cfe0f0;
+  background-color: var(--cor-superficie-clara);
 }
 
 .slot.evento {
-  color: #ffffff;
+  color: #190019;
   font-size: 0.75rem;
   font-weight: bold;
 }
 
 .slot.evento.marcado {
-  outline: 2px solid #1f3b57;
+  outline: 2px solid var(--cor-destaque);
   outline-offset: -2px;
 }
 
@@ -212,21 +450,21 @@
 .rotulo-dia-semana {
   text-align: center;
   font-size: 0.75rem;
-  color: #666;
+  color: var(--cor-texto-suave);
   padding-bottom: 4px;
 }
 
 .dia-mes {
-  background: #ffffff;
-  border-radius: 6px;
+  background: var(--cor-superficie);
+  border-radius: 12px;
   min-height: 64px;
   padding: 6px;
   cursor: pointer;
-  border: 1px solid #e5e2d9;
+  border: 1px solid var(--cor-superficie-clara);
 }
 
 .dia-mes:hover {
-  border-color: #1f3b57;
+  border-color: var(--cor-destaque);
 }
 
 .dia-mes.fora-do-mes {
@@ -234,20 +472,20 @@
 }
 
 .dia-mes.hoje {
-  border: 2px solid #1f3b57;
+  border: 2px solid var(--cor-destaque);
 }
 
 .dia-mes .numero-dia {
   font-size: 0.8rem;
-  color: #2c2c2a;
+  color: var(--cor-texto-claro);
   font-weight: 500;
 }
 
 .dia-mes .badge-eventos {
   margin-top: 6px;
   display: inline-block;
-  background: #1f3b57;
-  color: #fff;
+  background: var(--cor-destaque);
+  color: var(--cor-fundo);
   font-size: 0.65rem;
   border-radius: 10px;
   padding: 1px 6px;
@@ -266,42 +504,42 @@
 }
 
 .mes-card {
-  background: #ffffff;
-  border-radius: 8px;
+  background: var(--cor-superficie);
+  border-radius: 14px;
   padding: 14px;
   text-align: center;
   cursor: pointer;
-  border: 1px solid #e5e2d9;
+  border: 1px solid var(--cor-superficie-clara);
 }
 
 .mes-card:hover {
-  border-color: #1f3b57;
+  border-color: var(--cor-destaque);
 }
 
 .mes-card.mes-atual {
-  border: 2px solid #1f3b57;
+  border: 2px solid var(--cor-destaque);
 }
 
 .mes-card .nome-mes {
   font-weight: 500;
-  color: #2c2c2a;
+  color: var(--cor-texto-claro);
   margin-bottom: 4px;
 }
 
 .mes-card .contagem-mes {
   font-size: 0.75rem;
-  color: #666;
+  color: var(--cor-texto-suave);
 }
 
 /* --- Barra flutuante de ações --- */
 .barra-flutuante {
   display: none;
   position: fixed;
-  background: #1f3b57;
+  background: var(--cor-superficie-clara);
   border-radius: 8px;
   padding: 6px;
   gap: 6px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }
 
 .barra-flutuante.visivel {
@@ -309,7 +547,8 @@
 }
 
 .barra-flutuante button {
-  background: #ffffff;
+  background: var(--cor-destaque);
+  color: var(--cor-fundo);
   border: none;
   border-radius: 4px;
   padding: 6px 10px;

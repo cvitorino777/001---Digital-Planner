@@ -7,63 +7,110 @@
     <link rel="stylesheet" href="planejamento.css" />
   </head>
   <body class="pagina-planejamento">
-    <header class="cabecalho-planejamento">
-      <h1>Planejamento</h1>
-    </header>
+    <div class="layout-app">
+      <aside class="sidebar">
+        <div class="marca-sidebar">
+          <span class="marca-logo">P</span>
+          <span class="marca-nome">Meu Planner</span>
+        </div>
 
-    <div class="barra-contadores">
-      <div class="contador">
-        <span class="numero" id="numero-pendentes">0</span>
-        <span class="rotulo">Pendentes</span>
-      </div>
-      <div class="contador">
-        <span class="numero" id="numero-hoje">0</span>
-        <span class="rotulo">Hoje</span>
-      </div>
-      <div class="contador">
-        <span class="numero" id="numero-concluidos">0</span>
-        <span class="rotulo">Concluídos</span>
-      </div>
+        <div class="perfil-sidebar">
+          <div class="avatar-placeholder">C</div>
+          <div class="perfil-info">
+            <span class="perfil-nome">Cesar</span>
+            <span class="perfil-sub">ProdC$R</span>
+          </div>
+        </div>
+
+        <nav class="nav-sidebar">
+          <span class="nav-titulo">Menu</span>
+          <button class="nav-item ativo" data-categoria="daily">
+            <span class="nav-icone">●</span> <span class="nav-texto">Daily</span>
+          </button>
+          <button class="nav-item" data-categoria="planners">
+            <span class="nav-icone">●</span> <span class="nav-texto">Planners</span>
+          </button>
+          <button class="nav-item" data-categoria="pessoal">
+            <span class="nav-icone">●</span> <span class="nav-texto">Pessoal</span>
+          </button>
+          <button class="nav-item" data-categoria="metas">
+            <span class="nav-icone">●</span> <span class="nav-texto">Metas</span>
+          </button>
+        </nav>
+      </aside>
+
+      <main class="conteudo-principal">
+        <div class="barra-superior">
+          <div class="busca-superior">
+            <span class="icone-busca">⌕</span>
+            <input type="text" placeholder="Buscar evento..." disabled />
+          </div>
+          <div class="perfil-superior">
+            <div class="avatar-superior">C</div>
+            <span class="nome-superior">Cesar</span>
+            <span class="seta-superior">▾</span>
+          </div>
+        </div>
+
+        <header class="cabecalho-planejamento">
+          <h1>Planejamento</h1>
+        </header>
+
+        <div class="barra-contadores">
+          <div class="contador">
+            <span class="numero" id="numero-pendentes">0</span>
+            <span class="rotulo">Pendentes</span>
+          </div>
+          <div class="contador">
+            <span class="numero" id="numero-hoje">0</span>
+            <span class="rotulo">Hoje</span>
+          </div>
+          <div class="contador">
+            <span class="numero" id="numero-concluidos">0</span>
+            <span class="rotulo">Concluídos</span>
+          </div>
+        </div>
+
+        <div class="legenda-categorias">
+          <span class="item-legenda"><i style="background:#378ADD"></i>Trabalho</span>
+          <span class="item-legenda"><i style="background:#7F77DD"></i>Faculdade</span>
+          <span class="item-legenda"><i style="background:#D4537E"></i>Música</span>
+          <span class="item-legenda"><i style="background:#639922"></i>Pessoal</span>
+          <span class="item-legenda"><i style="background:#D85A30"></i>Outro</span>
+        </div>
+
+        <div class="barra-visualizacao">
+          <div class="navegacao">
+            <button id="botao-anterior" aria-label="Anterior">‹</button>
+            <button id="botao-hoje">Hoje</button>
+            <button id="botao-proximo" aria-label="Próximo">›</button>
+          </div>
+          <h2 id="titulo-periodo"></h2>
+          <div class="seletor-visualizacao" id="seletor-visualizacao">
+            <button data-visao="dia">Dia</button>
+            <button data-visao="semana" class="ativo">Semana</button>
+            <button data-visao="mes">Mês</button>
+            <button data-visao="ano">Ano</button>
+          </div>
+        </div>
+
+        <p class="dica" id="dica-interacao">Clique e arraste na coluna de um dia pra criar um evento.</p>
+
+        <div class="grid-wrapper" id="area-grid">
+          <table class="grid-semana" id="grid-semana">
+            <thead>
+              <tr id="linha-dias">
+                <th class="coluna-hora"></th>
+              </tr>
+            </thead>
+            <tbody id="corpo-grid"></tbody>
+          </table>
+        </div>
+
+        <div class="area-mes oculto" id="area-mes"></div>
+        <div class="area-ano oculto" id="area-ano"></div>
+      </main>
     </div>
-
-    <div class="legenda-categorias">
-      <span class="item-legenda"><i style="background:#378ADD"></i>Trabalho</span>
-      <span class="item-legenda"><i style="background:#7F77DD"></i>Faculdade</span>
-      <span class="item-legenda"><i style="background:#D4537E"></i>Música</span>
-      <span class="item-legenda"><i style="background:#639922"></i>Pessoal</span>
-      <span class="item-legenda"><i style="background:#D85A30"></i>Outro</span>
-    </div>
-
-    <div class="barra-visualizacao">
-      <div class="navegacao">
-        <button id="botao-anterior" aria-label="Anterior">‹</button>
-        <button id="botao-hoje">Hoje</button>
-        <button id="botao-proximo" aria-label="Próximo">›</button>
-      </div>
-      <h2 id="titulo-periodo"></h2>
-      <div class="seletor-visualizacao" id="seletor-visualizacao">
-        <button data-visao="dia">Dia</button>
-        <button data-visao="semana" class="ativo">Semana</button>
-        <button data-visao="mes">Mês</button>
-        <button data-visao="ano">Ano</button>
-      </div>
-    </div>
-
-    <p class="dica" id="dica-interacao">Clique e arraste na coluna de um dia pra criar um evento.</p>
-
-    <div class="grid-wrapper" id="area-grid">
-      <table class="grid-semana" id="grid-semana">
-        <thead>
-          <tr id="linha-dias">
-            <th class="coluna-hora"></th>
-          </tr>
-        </thead>
-        <tbody id="corpo-grid"></tbody>
-      </table>
-    </div>
-
-    <div class="area-mes oculto" id="area-mes"></div>
-    <div class="area-ano oculto" id="area-ano"></div>
 
     <div class="barra-flutuante" id="barra-flutuante">
       <button id="botao-concluir">Concluir</button>
