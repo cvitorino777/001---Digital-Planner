@@ -692,63 +692,28 @@
 /* RESPONSIVO - CELULAR */
 /* ========================= */
 
-@media screen and (max-width: 768px) {
+@media (max-width: 768px) {
 
   body {
-    padding: 10px;
+    overflow-x: hidden;
+  }
+
+  * {
+    box-sizing: border-box;
   }
 
   .container {
     width: 100%;
-    padding: 15px;
+    padding: 10px;
   }
 
-  .cards {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .card {
+  .calendar {
     width: 100%;
+    overflow-x: auto;
   }
 
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 64px;
-    z-index: 20;
-    flex-shrink: 0;
-    background-color: var(--cor-superficie);
-    border-right: 1px solid var(--cor-superficie-clara);
-    padding: 20px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    overflow: hidden;
-    transition: width 0.2s ease;
+  .fc {
+    min-width: 700px;
   }
 
-  h1 {
-    font-size: 1.8rem;
-  }
-
-  h2 {
-    font-size: 1.3rem;
-  }
-
-  p {
-    font-size: 0.95rem;
-  }
-
-  button {
-    width: 100%;
-  }
-
-  img {
-    max-width: 100%;
-    height: auto;
-  }
 }
