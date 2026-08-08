@@ -454,6 +454,138 @@
   font-weight: 600;
 }
 
+/* --- Visão mobile (um dia por vez) --- */
+.dia-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 0 24px;
+}
+
+.dia-mobile.oculto {
+  display: none;
+}
+
+.linha-hora-mobile {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  min-height: 38px;
+}
+
+.rotulo-hora-mobile {
+  width: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--cor-texto-suave);
+}
+
+.evento-mobile {
+  flex: 1;
+  background: color-mix(in srgb, var(--cor-evento, var(--cor-1)) 28%, rgba(255, 255, 255, 0.06));
+  border: none;
+  border-left: 4px solid var(--cor-evento, var(--cor-1));
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--cor-texto-claro);
+  text-align: left;
+  cursor: pointer;
+}
+
+.evento-mobile.marcado {
+  outline: 2px solid var(--cor-evento, var(--cor-1));
+  outline-offset: -2px;
+}
+
+.evento-mobile.concluido {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+.evento-mobile-continuacao {
+  flex: 1;
+  border-left: 4px solid var(--cor-evento, var(--cor-1));
+  opacity: 0.35;
+  border-radius: 10px;
+}
+
+.slot-vazio-mobile {
+  flex: 1;
+  min-height: 36px;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--cor-texto-suave);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.slot-vazio-mobile:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* --- Responsivo geral --- */
+@media (max-width: 700px) {
+  .sidebar {
+    width: 52px;
+    padding: 16px 8px;
+  }
+
+  .conteudo-principal {
+    margin-left: 52px;
+    padding: 16px 14px;
+  }
+
+  .barra-superior {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .busca-superior {
+    width: 100%;
+  }
+
+  .barra-contadores {
+    flex-wrap: wrap;
+  }
+
+  .contador {
+    min-width: 78px;
+    padding: 8px 14px;
+  }
+
+  .grade-ano {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dia-mes {
+    min-height: 48px;
+  }
+
+  .modal-evento {
+    left: 50% !important;
+    top: auto !important;
+    bottom: 12px;
+    transform: translateX(-50%);
+    width: 92vw;
+    max-width: 360px;
+    max-height: 80vh;
+  }
+
+  .barra-flutuante {
+    left: 50% !important;
+    top: auto !important;
+    bottom: 16px !important;
+    transform: translateX(-50%);
+  }
+}
+
 /* --- Barra de visualização --- */
 .barra-visualizacao {
   display: flex;

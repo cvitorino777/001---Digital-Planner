@@ -76,6 +76,10 @@ function mesmaData(a, b) {
   return formatarISO(a) === formatarISO(b);
 }
 
+function ehMobile() {
+  return window.matchMedia("(max-width: 700px)").matches;
+}
+
 // --- Planners (listas separadas de eventos) ---
 function carregarListaPlanners() {
   const salvo = localStorage.getItem("planner-lista");
@@ -107,7 +111,7 @@ migrarEventosAntigos();
 let plannerAtivoId = localStorage.getItem("planner-ativo") || listaPlanners[0].id;
 let categorias = carregarCategorias();
 let eventos = carregarEventos(); // { "2026-08-01-3": { texto, categoriaId, cor, grupoId, primeira, feita, prioridadeId, serieId }, ... }
-let visualizacao = "semana"; // dia | semana | mes | ano
+let visualizacao = ehMobile() ? "dia" : "semana"; // dia | semana | mes | ano
 let dataReferencia = normalizarData(new Date());
 
 let selecionando = false;
@@ -256,6 +260,70 @@ function renderizarEventosNoGrid() {
       }
     }
   });
+}
+
+// ==================================================
+// VISÃO MOBILE (um dia por vez, em lista)
+// ==================================================
+function renderizarDiaMobile() {
+  const container = document.getElementById("dia-mobile");
+  container.innerHTML = "";
+  const iso = formatarISO(dataReferencia);
+
+  HORAS.forEach((hora, indiceHora) => {
+    const chave = `${iso}-${indiceHora}`;
+    const evento = eventos[chave];
+
+    const linha = document.createElement("div");
+    linha.className = "linha-hora-mobile";
+
+    const rotulo = document.createElement("div");
+    rotulo.className = "rotulo-hora-mobile";
+    rotulo.textContent = hora;
+    linha.appendChild(rotulo);
+
+    if (evento && evento.primeira) {
+      const prioridade = evento.prioridadeId ? obterPrioridade(evento.prioridadeId) : null;
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className =
+        "evento-mobile" +
+        (evento.feita ? " concluido" : "") +
+        (evento.grupoId === grupoMarcado ? " marcado" : "");
+      card.style.setProperty("--cor-evento", evento.cor);
+      card.textContent = prioridade ? `${prioridade.emoji} ${evento.texto}` : evento.texto;
+      card.addEventListener("click", () => marcarEventoMobile(evento.grupoId, card));
+      linha.appendChild(card);
+    } else if (!evento) {
+      const vazio = document.createElement("button");
+      vazio.type = "button";
+      vazio.className = "slot-vazio-mobile";
+      vazio.textContent = "+";
+      vazio.addEventListener("click", () => {
+        selecaoPendente = { dataSelecao: iso, de: indiceHora, ate: indiceHora };
+        abrirModalEvento(vazio);
+      });
+      linha.appendChild(vazio);
+    } else {
+      const continuo = document.createElement("div");
+      continuo.className = "evento-mobile-continuacao";
+      continuo.style.setProperty("--cor-evento", evento.cor);
+      linha.appendChild(continuo);
+    }
+
+    container.appendChild(linha);
+  });
+}
+
+function marcarEventoMobile(grupoId, elemento) {
+  const posicao = elemento.getBoundingClientRect();
+  grupoMarcado = grupoMarcado === grupoId ? null : grupoId;
+  renderizarDiaMobile();
+  if (grupoMarcado) {
+    mostrarBarra(posicao);
+  } else {
+    esconderBarra();
+  }
 }
 
 function iniciarSelecao(celula) {
@@ -456,9 +524,9 @@ function marcarEvento(celula) {
   mostrarBarra(celula);
 }
 
-function mostrarBarra(celula) {
+function mostrarBarra(referencia) {
   const barra = document.getElementById("barra-flutuante");
-  const posicao = celula.getBoundingClientRect();
+  const posicao = referencia.getBoundingClientRect ? referencia.getBoundingClientRect() : referencia;
   barra.style.left = `${posicao.left}px`;
   barra.style.top = `${posicao.top - 44}px`;
   barra.classList.add("visivel");
@@ -784,18 +852,30 @@ function atualizarVisualizacao() {
   const areaMes = document.getElementById("area-mes");
   const areaAno = document.getElementById("area-ano");
   const dica = document.getElementById("dica-interacao");
+  const tabela = document.getElementById("grid-semana");
+  const diaMobile = document.getElementById("dia-mobile");
 
   areaGrid.classList.add("oculto");
   areaMes.classList.add("oculto");
   areaAno.classList.add("oculto");
   dica.classList.add("oculto");
+  tabela.classList.add("oculto");
+  diaMobile.classList.add("oculto");
 
   if (visualizacao === "dia" || visualizacao === "semana") {
     areaGrid.classList.remove("oculto");
-    dica.classList.remove("oculto");
-    montarCabecalhoGrid();
-    montarCorpoGrid();
-    renderizarEventosNoGrid();
+    const modoMobileDia = ehMobile() && visualizacao === "dia";
+
+    if (modoMobileDia) {
+      diaMobile.classList.remove("oculto");
+      renderizarDiaMobile();
+    } else {
+      tabela.classList.remove("oculto");
+      dica.classList.remove("oculto");
+      montarCabecalhoGrid();
+      montarCorpoGrid();
+      renderizarEventosNoGrid();
+    }
   } else if (visualizacao === "mes") {
     areaMes.classList.remove("oculto");
     renderizarMes();
@@ -900,8 +980,17 @@ function buscarEventos(termo) {
 configurarEventosDoGrid();
 renderizarListaPlanners();
 renderizarLegendaCategorias();
+document.querySelectorAll("#seletor-visualizacao button").forEach((botao) => {
+  botao.classList.toggle("ativo", botao.dataset.visao === visualizacao);
+});
 atualizarVisualizacao();
 atualizarSaudacao();
+
+let redimensionamentoTimeout;
+window.addEventListener("resize", () => {
+  clearTimeout(redimensionamentoTimeout);
+  redimensionamentoTimeout = setTimeout(atualizarVisualizacao, 200);
+});
 
 document.getElementById("input-busca").addEventListener("input", (ev) => {
   buscarEventos(ev.target.value);

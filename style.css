@@ -65,6 +65,37 @@ body::after {
   padding: 0 20px;
 }
 
+@media (max-width: 700px) {
+  body::before {
+    width: 380px;
+    height: 380px;
+    opacity: 0.16;
+    top: -140px;
+    left: -130px;
+  }
+
+  body::after {
+    width: 320px;
+    height: 320px;
+    opacity: 0.13;
+    bottom: -140px;
+    right: -130px;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at top left, var(--cor-1) 0%, transparent 30%),
+      radial-gradient(circle at bottom right, var(--cor-2) 0%, transparent 26%),
+      linear-gradient(160deg, var(--cor-5), var(--cor-4), var(--cor-3));
+  }
+}
+
+@media (max-width: 480px) {
+  .frase {
+    font-size: 1.5rem;
+  }
+}
+
 .frase {
   font-size: 2rem;
   color: var(--cor-texto-claro);
@@ -87,15 +118,4 @@ body::after {
 .botao-comecar:hover {
   transform: translateY(-3px);
   box-shadow: 0 12px 25px rgba(32, 120, 207, 0.45);
-}
-
-@media (max-width: 480px) {
-  .frase {
-    font-size: 1.5rem;
-  }
-
-  .botao-comecar {
-    padding: 12px 28px;
-    font-size: 0.95rem;
-  }
 }
