@@ -52,6 +52,10 @@
   width: 220px;
 }
 
+.sidebar.expandido {
+  width: 220px;
+}
+
 .marca-nome,
 .nav-titulo,
 .nav-texto {
@@ -65,7 +69,10 @@
 
 .sidebar:hover .marca-nome,
 .sidebar:hover .nav-titulo,
-.sidebar:hover .nav-texto {
+.sidebar:hover .nav-texto,
+.sidebar.expandido .marca-nome,
+.sidebar.expandido .nav-titulo,
+.sidebar.expandido .nav-texto {
   opacity: 1;
   max-width: 160px;
 }

@@ -527,9 +527,29 @@ function marcarEvento(celula) {
 function mostrarBarra(referencia) {
   const barra = document.getElementById("barra-flutuante");
   const posicao = referencia.getBoundingClientRect ? referencia.getBoundingClientRect() : referencia;
+
   barra.style.left = `${posicao.left}px`;
   barra.style.top = `${posicao.top - 44}px`;
   barra.classList.add("visivel");
+
+  // Mede o tamanho real da barra já visível e ajusta se estiver saindo da tela
+  const margem = 8;
+  const retanguloBarra = barra.getBoundingClientRect();
+
+  let esquerda = posicao.left;
+  if (esquerda + retanguloBarra.width > window.innerWidth - margem) {
+    esquerda = window.innerWidth - retanguloBarra.width - margem;
+  }
+  if (esquerda < margem) esquerda = margem;
+
+  let topo = posicao.top - 44;
+  if (topo < margem) topo = posicao.bottom + 6; // sem espaço em cima: mostra embaixo da célula
+  if (topo + retanguloBarra.height > window.innerHeight - margem) {
+    topo = window.innerHeight - retanguloBarra.height - margem;
+  }
+
+  barra.style.left = `${esquerda}px`;
+  barra.style.top = `${topo}px`;
 }
 
 function esconderBarra() {
@@ -604,6 +624,43 @@ function configurarEventosDoGrid() {
   });
 
   document.addEventListener("mouseup", finalizarSelecao);
+
+  // --- Toque (celular/tablet): touch events não disparam mouseover durante o arraste,
+  // então usamos elementFromPoint pra descobrir sobre qual célula o dedo está passando.
+  corpo.addEventListener(
+    "touchstart",
+    (ev) => {
+      const toque = ev.touches[0];
+      const celula = document.elementFromPoint(toque.clientX, toque.clientY)?.closest(".slot");
+      if (!celula) return;
+
+      if (celula.classList.contains("evento")) {
+        marcarEvento(celula);
+        return;
+      }
+      if (areaTransferencia) {
+        tentarColar(celula);
+        return;
+      }
+      ev.preventDefault(); // evita rolar a página enquanto seleciona o horário
+      iniciarSelecao(celula);
+    },
+    { passive: false }
+  );
+
+  corpo.addEventListener(
+    "touchmove",
+    (ev) => {
+      if (!selecionando) return;
+      ev.preventDefault();
+      const toque = ev.touches[0];
+      const celula = document.elementFromPoint(toque.clientX, toque.clientY)?.closest(".slot");
+      if (celula) estenderSelecao(celula);
+    },
+    { passive: false }
+  );
+
+  document.addEventListener("touchend", finalizarSelecao);
 }
 
 // ==================================================
@@ -985,6 +1042,18 @@ document.querySelectorAll("#seletor-visualizacao button").forEach((botao) => {
 });
 atualizarVisualizacao();
 atualizarSaudacao();
+
+// Em telas de toque (sem :hover), a sidebar expande/recolhe ao tocar na marca
+document.querySelector(".marca-sidebar").addEventListener("click", () => {
+  document.querySelector(".sidebar").classList.toggle("expandido");
+});
+
+document.addEventListener("click", (ev) => {
+  const sidebar = document.querySelector(".sidebar");
+  if (!ev.target.closest(".sidebar") && sidebar.classList.contains("expandido")) {
+    sidebar.classList.remove("expandido");
+  }
+});
 
 let redimensionamentoTimeout;
 window.addEventListener("resize", () => {
