@@ -9,14 +9,42 @@ const NOMES_MES = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
 ];
-// --- Categorias fixas ---
-const CATEGORIAS = {
-  1: { id: "trabalho", nome: "Trabalho", cor: "#378ADD" },
-  2: { id: "faculdade", nome: "Faculdade", cor: "#7F77DD" },
-  3: { id: "musica", nome: "Música", cor: "#D4537E" },
-  4: { id: "pessoal", nome: "Pessoal", cor: "#639922" },
-  5: { id: "outro", nome: "Outro", cor: "#D85A30" },
-};
+
+// --- Categorias (padrão + personalizadas) ---
+const CATEGORIAS_PADRAO = [
+  { id: "trabalho", nome: "Trabalho", cor: "#378ADD" },
+  { id: "faculdade", nome: "Faculdade", cor: "#7F77DD" },
+  { id: "musica", nome: "Música", cor: "#D4537E" },
+  { id: "pessoal", nome: "Pessoal", cor: "#639922" },
+  { id: "outro", nome: "Outro", cor: "#D85A30" },
+];
+
+function carregarCategorias() {
+  const salvo = localStorage.getItem("planner-categorias");
+  if (salvo) return JSON.parse(salvo);
+  localStorage.setItem("planner-categorias", JSON.stringify(CATEGORIAS_PADRAO));
+  return [...CATEGORIAS_PADRAO];
+}
+
+function salvarCategorias() {
+  localStorage.setItem("planner-categorias", JSON.stringify(categorias));
+}
+
+function obterCategoria(id) {
+  return categorias.find((c) => c.id === id) || categorias[categorias.length - 1];
+}
+
+// --- Prioridades fixas ---
+const PRIORIDADES = [
+  { id: "urgente", nome: "Urgente", cor: "#e5484d", emoji: "🔴" },
+  { id: "alta", nome: "Alta", cor: "#f5a623", emoji: "🟠" },
+  { id: "media", nome: "Média", cor: "#e8d84a", emoji: "🟡" },
+  { id: "baixa", nome: "Baixa", cor: "#4caf50", emoji: "🟢" },
+];
+
+function obterPrioridade(id) {
+  return PRIORIDADES.find((p) => p.id === id) || null;
+}
 
 // --- Utilidades de data ---
 function normalizarData(data) {
@@ -77,7 +105,8 @@ function migrarEventosAntigos() {
 let listaPlanners = carregarListaPlanners();
 migrarEventosAntigos();
 let plannerAtivoId = localStorage.getItem("planner-ativo") || listaPlanners[0].id;
-let eventos = carregarEventos(); // { "2026-08-01-3": { texto, categoriaId, cor, grupoId, primeira, feita }, ... }
+let categorias = carregarCategorias();
+let eventos = carregarEventos(); // { "2026-08-01-3": { texto, categoriaId, cor, grupoId, primeira, feita, prioridadeId, serieId }, ... }
 let visualizacao = "semana"; // dia | semana | mes | ano
 let dataReferencia = normalizarData(new Date());
 
@@ -88,6 +117,8 @@ let fimSelecao = null;
 let grupoMarcado = null;
 let areaTransferencia = null;
 let selecaoPendente = null;
+let categoriaSelecionadaId = categorias[0].id;
+let prioridadeSelecionadaId = null;
 
 // --- Armazenamento local ---
 function carregarEventos() {
@@ -100,18 +131,62 @@ function salvarEventos() {
 }
 
 // --- Criar / colar evento ---
-function criarEvento(data, horaInicio, tamanho, texto, categoria, feitaForcada) {
+function criarEvento(data, horaInicio, tamanho, texto, categoria, feitaForcada, prioridadeId, serieId) {
   const iso = formatarISO(data);
-  const grupoId = `${iso}-${horaInicio}-${Date.now()}`;
-  const cat = categoria || CATEGORIAS[5];
+  const grupoId = `${iso}-${horaInicio}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+  const cat = categoria || categorias[categorias.length - 1];
 
   for (let i = 0; i < tamanho; i++) {
     const chave = `${iso}-${horaInicio + i}`;
-    eventos[chave] = { texto, categoriaId: cat.id, cor: cat.cor, grupoId, primeira: i === 0, feita: feitaForcada || false };
+    eventos[chave] = {
+      texto,
+      categoriaId: cat.id,
+      cor: cat.cor,
+      grupoId,
+      primeira: i === 0,
+      feita: feitaForcada || false,
+      prioridadeId: prioridadeId || null,
+      serieId: serieId || null,
+    };
   }
 
   salvarEventos();
   atualizarVisualizacao();
+}
+
+// --- Recorrência ---
+function gerarDatasRecorrencia(dataBase, tipo, diasSemana, quantidade) {
+  if (tipo === "nenhuma" || quantidade < 1) return [dataBase];
+
+  if (tipo === "diaria") {
+    return Array.from({ length: quantidade }, (_, i) => somarDias(dataBase, i));
+  }
+
+  if (tipo === "semanal") {
+    return Array.from({ length: quantidade }, (_, i) => somarDias(dataBase, i * 7));
+  }
+
+  if (tipo === "mensal") {
+    return Array.from({ length: quantidade }, (_, i) => {
+      const proxima = new Date(dataBase);
+      proxima.setMonth(proxima.getMonth() + i);
+      return normalizarData(proxima);
+    });
+  }
+
+  if (tipo === "dias-especificos" && diasSemana.length > 0) {
+    const datas = [];
+    let cursor = normalizarData(dataBase);
+    let seguranca = 0;
+    while (datas.length < quantidade && seguranca < 400) {
+      if (diasSemana.includes(cursor.getDay())) datas.push(new Date(cursor));
+      cursor = somarDias(cursor, 1);
+      seguranca++;
+    }
+    return datas;
+  }
+
+  return [dataBase];
 }
 
 // ==================================================
@@ -175,7 +250,10 @@ function renderizarEventosNoGrid() {
       if (evento.feita) celula.classList.add("concluido");
       celula.style.setProperty("--cor-evento", evento.cor);
       if (evento.grupoId === grupoMarcado) celula.classList.add("marcado");
-      if (evento.primeira) celula.textContent = evento.texto;
+      if (evento.primeira) {
+        const prioridade = evento.prioridadeId ? obterPrioridade(evento.prioridadeId) : null;
+        celula.textContent = prioridade ? `${prioridade.emoji} ${evento.texto}` : evento.texto;
+      }
     }
   });
 }
@@ -206,8 +284,6 @@ function destacarSelecao() {
   });
 }
 
-let categoriaSelecionadaId = 1;
-
 function finalizarSelecao() {
   if (!selecionando) return;
   selecionando = false;
@@ -221,40 +297,115 @@ function finalizarSelecao() {
   abrirModalEvento(celulaFinal);
 }
 
+// --- Modal: categorias ---
 function montarOpcoesCategoria() {
   const container = document.getElementById("opcoes-categoria");
   container.innerHTML = "";
-  Object.entries(CATEGORIAS).forEach(([numero, cat]) => {
+
+  categorias.forEach((cat) => {
     const opcao = document.createElement("button");
     opcao.type = "button";
-    opcao.className = "opcao-categoria" + (Number(numero) === categoriaSelecionadaId ? " selecionada" : "");
-    opcao.dataset.numero = numero;
+    opcao.className = "opcao-categoria" + (cat.id === categoriaSelecionadaId ? " selecionada" : "");
+    opcao.dataset.id = cat.id;
     opcao.innerHTML = `<i style="background:${cat.cor}"></i>${cat.nome}`;
     opcao.addEventListener("click", () => {
-      categoriaSelecionadaId = Number(numero);
-      container.querySelectorAll(".opcao-categoria").forEach((el) => el.classList.remove("selecionada"));
-      opcao.classList.add("selecionada");
+      categoriaSelecionadaId = cat.id;
+      montarOpcoesCategoria();
     });
     container.appendChild(opcao);
   });
+
+  const botaoNova = document.createElement("button");
+  botaoNova.type = "button";
+  botaoNova.className = "opcao-categoria opcao-nova-categoria";
+  botaoNova.textContent = "+ Nova";
+  botaoNova.addEventListener("click", abrirFormNovaCategoria);
+  container.appendChild(botaoNova);
+}
+
+function abrirFormNovaCategoria() {
+  document.getElementById("form-nova-categoria").classList.remove("oculto");
+  document.getElementById("input-nome-categoria").focus();
+}
+
+function fecharFormNovaCategoria() {
+  document.getElementById("form-nova-categoria").classList.add("oculto");
+  document.getElementById("input-nome-categoria").value = "";
+}
+
+function confirmarNovaCategoria() {
+  const nome = document.getElementById("input-nome-categoria").value.trim();
+  const cor = document.getElementById("input-cor-categoria").value;
+  if (!nome) return;
+
+  const id = `${nome.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${Date.now()}`;
+  categorias.push({ id, nome, cor });
+  salvarCategorias();
+  categoriaSelecionadaId = id;
+
+  fecharFormNovaCategoria();
+  montarOpcoesCategoria();
+  renderizarLegendaCategorias();
+}
+
+// --- Modal: prioridades ---
+function montarOpcoesPrioridade() {
+  const container = document.getElementById("opcoes-prioridade");
+  container.innerHTML = "";
+
+  const opcaoNenhuma = document.createElement("button");
+  opcaoNenhuma.type = "button";
+  opcaoNenhuma.className = "opcao-prioridade" + (prioridadeSelecionadaId === null ? " selecionada" : "");
+  opcaoNenhuma.textContent = "Sem prioridade";
+  opcaoNenhuma.addEventListener("click", () => {
+    prioridadeSelecionadaId = null;
+    montarOpcoesPrioridade();
+  });
+  container.appendChild(opcaoNenhuma);
+
+  PRIORIDADES.forEach((p) => {
+    const opcao = document.createElement("button");
+    opcao.type = "button";
+    opcao.className = "opcao-prioridade" + (p.id === prioridadeSelecionadaId ? " selecionada" : "");
+    opcao.innerHTML = `${p.emoji} ${p.nome}`;
+    opcao.addEventListener("click", () => {
+      prioridadeSelecionadaId = p.id;
+      montarOpcoesPrioridade();
+    });
+    container.appendChild(opcao);
+  });
+}
+
+// --- Modal: recorrência ---
+function resetarRecorrencia() {
+  document.getElementById("select-recorrencia").value = "nenhuma";
+  document.getElementById("input-repeticoes").value = 8;
+  document.querySelectorAll(".dia-semana-opcao").forEach((el) => el.classList.remove("selecionado"));
+  document.getElementById("container-dias-semana").classList.add("oculto");
+  document.getElementById("container-repeticoes").classList.add("oculto");
 }
 
 function abrirModalEvento(celulaReferencia) {
   const modal = document.getElementById("modal-evento");
   const input = document.getElementById("input-nome-evento");
 
+  categoriaSelecionadaId = categorias[0].id;
+  prioridadeSelecionadaId = null;
   montarOpcoesCategoria();
+  montarOpcoesPrioridade();
+  fecharFormNovaCategoria();
+  resetarRecorrencia();
   modal.classList.remove("oculto");
 
   const posicao = celulaReferencia.getBoundingClientRect();
   const espacoAbaixo = window.innerHeight - posicao.bottom;
-  if (espacoAbaixo > 180) {
+  if (espacoAbaixo > 380) {
     modal.style.top = `${posicao.bottom + 6}px`;
   } else {
-    modal.style.top = `${posicao.top - 190}px`;
+    modal.style.top = `${Math.max(10, posicao.top - 390)}px`;
   }
   let esquerda = posicao.left;
-  if (esquerda + 230 > window.innerWidth) esquerda = window.innerWidth - 236;
+  if (esquerda + 260 > window.innerWidth) esquerda = window.innerWidth - 266;
   modal.style.left = `${esquerda}px`;
 
   input.value = "";
@@ -274,8 +425,20 @@ function confirmarCriacaoEvento() {
 
   const { dataSelecao, de, ate } = selecaoPendente;
   const [ano, mes, dia] = dataSelecao.split("-").map(Number);
-  const categoria = CATEGORIAS[categoriaSelecionadaId];
-  criarEvento(new Date(ano, mes - 1, dia), de, ate - de + 1, texto, categoria);
+  const dataBase = new Date(ano, mes - 1, dia);
+  const categoria = obterCategoria(categoriaSelecionadaId);
+
+  const tipoRecorrencia = document.getElementById("select-recorrencia").value;
+  const quantidade = Math.max(1, Number(document.getElementById("input-repeticoes").value) || 1);
+  const diasSemana = Array.from(document.querySelectorAll(".dia-semana-opcao.selecionado")).map((el) => Number(el.dataset.dia));
+
+  const datas = gerarDatasRecorrencia(dataBase, tipoRecorrencia, diasSemana, quantidade);
+  const serieId = datas.length > 1 ? `serie-${Date.now()}` : null;
+
+  datas.forEach((data) => {
+    criarEvento(data, de, ate - de + 1, texto, categoria, false, prioridadeSelecionadaId, serieId);
+  });
+
   fecharModalEvento();
 }
 
@@ -311,6 +474,7 @@ function copiarEventoMarcado() {
   areaTransferencia = {
     texto: celulasDoGrupo[0].texto,
     categoria: { id: celulasDoGrupo[0].categoriaId, cor: celulasDoGrupo[0].cor },
+    prioridadeId: celulasDoGrupo[0].prioridadeId || null,
     tamanho: celulasDoGrupo.length,
   };
   alert("Evento copiado! Clique numa célula vazia pra colar.");
@@ -343,7 +507,7 @@ function tentarColar(celula) {
   if (!areaTransferencia || celula.classList.contains("evento")) return false;
   const [ano, mes, dia] = celula.dataset.date.split("-").map(Number);
   const horaInicio = Number(celula.dataset.hora);
-  criarEvento(new Date(ano, mes - 1, dia), horaInicio, areaTransferencia.tamanho, areaTransferencia.texto, areaTransferencia.categoria);
+  criarEvento(new Date(ano, mes - 1, dia), horaInicio, areaTransferencia.tamanho, areaTransferencia.texto, areaTransferencia.categoria, false, areaTransferencia.prioridadeId, null);
   areaTransferencia = null;
   return true;
 }
@@ -499,8 +663,75 @@ function atualizarContadores() {
   const hojeUnicos = new Set(hoje.map((chave) => eventos[chave].grupoId)).size;
 
   document.getElementById("numero-pendentes").textContent = pendentes;
-  document.getElementById("numero-concluidos").textContent = concluidos;
   document.getElementById("numero-hoje").textContent = hojeUnicos;
+  document.getElementById("numero-concluidos").textContent = concluidos;
+}
+
+// ==================================================
+// PAINEL DE HOJE (próximos eventos + progresso do dia)
+// ==================================================
+function obterEventosAgrupados() {
+  const grupos = {};
+  Object.entries(eventos).forEach(([chave, evento]) => {
+    if (!evento.primeira) return;
+    const [ano, mes, dia, hora] = chave.split("-").map(Number);
+    grupos[evento.grupoId] = { ...evento, ano, mes, dia, hora };
+  });
+  return Object.values(grupos);
+}
+
+function renderizarProximosEventos() {
+  const container = document.getElementById("lista-proximos-eventos");
+  if (!container) return;
+
+  const hoje = normalizarData(new Date());
+  const proximos = obterEventosAgrupados()
+    .filter((e) => !e.feita)
+    .filter((e) => normalizarData(new Date(e.ano, e.mes - 1, e.dia)) >= hoje)
+    .sort((a, b) => {
+      const chaveA = a.ano * 10000 + a.mes * 100 + a.dia;
+      const chaveB = b.ano * 10000 + b.mes * 100 + b.dia;
+      return chaveA !== chaveB ? chaveA - chaveB : a.hora - b.hora;
+    })
+    .slice(0, 4);
+
+  container.innerHTML = "";
+  if (proximos.length === 0) {
+    container.innerHTML = `<p class="painel-vazio">Nada por aqui. Que tal planejar algo? 🙂</p>`;
+    return;
+  }
+
+  proximos.forEach((evento) => {
+    const dataEvento = normalizarData(new Date(evento.ano, evento.mes - 1, evento.dia));
+    const rotuloData = mesmaData(dataEvento, new Date()) ? "Hoje" : `${NOMES_DIA_CURTO[dataEvento.getDay()]} ${evento.dia}`;
+    const prioridade = evento.prioridadeId ? obterPrioridade(evento.prioridadeId) : null;
+
+    const item = document.createElement("div");
+    item.className = "item-proximo-evento";
+    item.innerHTML = `
+      <span class="ponto-proximo-evento" style="background:${evento.cor}"></span>
+      <span class="texto-proximo-evento">${prioridade ? prioridade.emoji + " " : ""}${evento.texto}</span>
+      <span class="quando-proximo-evento">${rotuloData} · ${HORAS[evento.hora]}</span>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function renderizarProgressoDia() {
+  const barra = document.getElementById("barra-progresso-dia");
+  const texto = document.getElementById("texto-progresso-dia");
+  if (!barra || !texto) return;
+
+  const isoHoje = formatarISO(new Date());
+  const eventosHoje = obterEventosAgrupados().filter(
+    (e) => `${e.ano}-${String(e.mes).padStart(2, "0")}-${String(e.dia).padStart(2, "0")}` === isoHoje
+  );
+  const total = eventosHoje.length;
+  const concluidos = eventosHoje.filter((e) => e.feita).length;
+  const porcentagem = total === 0 ? 0 : Math.round((concluidos / total) * 100);
+
+  barra.style.width = `${porcentagem}%`;
+  texto.textContent = total === 0 ? "Nenhuma tarefa hoje" : `${concluidos} de ${total} tarefas concluídas`;
 }
 
 // ==================================================
@@ -575,6 +806,8 @@ function atualizarVisualizacao() {
 
   atualizarTitulo();
   atualizarContadores();
+  renderizarProximosEventos();
+  renderizarProgressoDia();
 }
 
 // --- Gerenciamento de planners ---
@@ -604,6 +837,19 @@ function criarPlanner(nome) {
   listaPlanners.push({ id, nome });
   salvarListaPlanners();
   trocarPlanner(id);
+}
+
+// --- Categorias: legenda ---
+function renderizarLegendaCategorias() {
+  const container = document.getElementById("legenda-categorias");
+  if (!container) return;
+  container.innerHTML = "";
+  categorias.forEach((cat) => {
+    const span = document.createElement("span");
+    span.className = "item-legenda";
+    span.innerHTML = `<i style="background:${cat.cor}"></i>${cat.nome}`;
+    container.appendChild(span);
+  });
 }
 
 // --- Busca de eventos ---
@@ -653,6 +899,7 @@ function buscarEventos(termo) {
 // --- Inicialização ---
 configurarEventosDoGrid();
 renderizarListaPlanners();
+renderizarLegendaCategorias();
 atualizarVisualizacao();
 atualizarSaudacao();
 
@@ -707,4 +954,22 @@ document.getElementById("botao-cancelar-evento").addEventListener("click", fecha
 document.getElementById("input-nome-evento").addEventListener("keydown", (ev) => {
   if (ev.key === "Enter") confirmarCriacaoEvento();
   if (ev.key === "Escape") fecharModalEvento();
+});
+
+document.getElementById("select-recorrencia").addEventListener("change", (ev) => {
+  const tipo = ev.target.value;
+  document.getElementById("container-dias-semana").classList.toggle("oculto", tipo !== "dias-especificos");
+  document.getElementById("container-repeticoes").classList.toggle("oculto", tipo === "nenhuma");
+});
+
+document.getElementById("container-dias-semana").addEventListener("click", (ev) => {
+  const botao = ev.target.closest(".dia-semana-opcao");
+  if (botao) botao.classList.toggle("selecionado");
+});
+
+document.getElementById("botao-confirmar-categoria").addEventListener("click", confirmarNovaCategoria);
+document.getElementById("botao-cancelar-categoria").addEventListener("click", fecharFormNovaCategoria);
+document.getElementById("input-nome-categoria").addEventListener("keydown", (ev) => {
+  if (ev.key === "Enter") confirmarNovaCategoria();
+  if (ev.key === "Escape") fecharFormNovaCategoria();
 });

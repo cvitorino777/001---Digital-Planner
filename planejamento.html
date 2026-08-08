@@ -63,12 +63,20 @@
         </div>
       </div>
 
-      <div class="legenda-categorias">
-        <span class="item-legenda"><i style="background:#378ADD"></i>Trabalho</span>
-        <span class="item-legenda"><i style="background:#7F77DD"></i>Faculdade</span>
-        <span class="item-legenda"><i style="background:#D4537E"></i>Música</span>
-        <span class="item-legenda"><i style="background:#639922"></i>Pessoal</span>
-        <span class="item-legenda"><i style="background:#D85A30"></i>Outro</span>
+      <div class="legenda-categorias" id="legenda-categorias"></div>
+
+      <div class="painel-hoje">
+        <div class="cartao-painel cartao-proximos">
+          <h3 class="titulo-painel">📌 Próximos eventos</h3>
+          <div class="lista-proximos-eventos" id="lista-proximos-eventos"></div>
+        </div>
+        <div class="cartao-painel cartao-progresso">
+          <h3 class="titulo-painel">Seu dia</h3>
+          <div class="trilha-progresso-dia">
+            <div class="barra-progresso-dia" id="barra-progresso-dia"></div>
+          </div>
+          <p class="texto-progresso-dia" id="texto-progresso-dia">Nenhuma tarefa hoje</p>
+        </div>
       </div>
 
       <div class="barra-visualizacao">
@@ -112,7 +120,45 @@
 
   <div class="modal-evento oculto" id="modal-evento">
     <input type="text" id="input-nome-evento" placeholder="Nome do evento" autocomplete="off" />
+
+    <span class="rotulo-modal">Categoria</span>
     <div class="opcoes-categoria" id="opcoes-categoria"></div>
+    <div class="form-nova-categoria oculto" id="form-nova-categoria">
+      <input type="text" id="input-nome-categoria" placeholder="Nome da categoria" autocomplete="off" />
+      <input type="color" id="input-cor-categoria" value="#378ADD" />
+      <div class="form-nova-categoria-acoes">
+        <button type="button" id="botao-cancelar-categoria">Cancelar</button>
+        <button type="button" id="botao-confirmar-categoria">Adicionar</button>
+      </div>
+    </div>
+
+    <span class="rotulo-modal">Prioridade</span>
+    <div class="opcoes-prioridade" id="opcoes-prioridade"></div>
+
+    <span class="rotulo-modal">Repetir</span>
+    <select id="select-recorrencia" class="select-recorrencia">
+      <option value="nenhuma">Não repete</option>
+      <option value="diaria">Todos os dias</option>
+      <option value="semanal">Toda semana</option>
+      <option value="dias-especificos">Dias específicos</option>
+      <option value="mensal">Todo mês</option>
+    </select>
+
+    <div class="dias-semana oculto" id="container-dias-semana">
+      <button type="button" class="dia-semana-opcao" data-dia="0">D</button>
+      <button type="button" class="dia-semana-opcao" data-dia="1">S</button>
+      <button type="button" class="dia-semana-opcao" data-dia="2">T</button>
+      <button type="button" class="dia-semana-opcao" data-dia="3">Q</button>
+      <button type="button" class="dia-semana-opcao" data-dia="4">Q</button>
+      <button type="button" class="dia-semana-opcao" data-dia="5">S</button>
+      <button type="button" class="dia-semana-opcao" data-dia="6">S</button>
+    </div>
+
+    <div class="campo-repeticoes oculto" id="container-repeticoes">
+      <label for="input-repeticoes">Quantas vezes</label>
+      <input type="number" id="input-repeticoes" min="1" max="52" value="8" />
+    </div>
+
     <div class="modal-acoes">
       <button id="botao-cancelar-evento">Cancelar</button>
       <button id="botao-criar-evento">Criar</button>

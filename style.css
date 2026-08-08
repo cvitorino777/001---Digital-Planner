@@ -1,10 +1,13 @@
 :root {
-  --cor-fundo: #f1bebe;
-  --cor-superficie: #ffffff;
-  --cor-superficie-clara: #d8d8d8;
-  --cor-texto-suave: #2c6478;
-  --cor-destaque: #ea9393;
-  --cor-texto-claro: #2c2c2a;
+  --cor-1: #2078cf;
+  --cor-2: #0e4eb2;
+  --cor-3: #011f65;
+  --cor-4: #020c47;
+  --cor-5: #000521;
+  --cor-superficie: rgba(255, 255, 255, 0.08);
+  --cor-superficie-clara: rgba(255, 255, 255, 0.14);
+  --cor-texto-suave: #b9c8ff;
+  --cor-texto-claro: #ffffff;
 }
 
 * {
@@ -14,8 +17,41 @@
 }
 
 body {
-  height: 100vh;
+  min-height: 100vh;
   font-family: "Segoe UI", Arial, sans-serif;
+  background:
+    radial-gradient(circle at top left, var(--cor-1) 0%, transparent 45%),
+    radial-gradient(circle at bottom right, var(--cor-2) 0%, transparent 40%),
+    linear-gradient(160deg, var(--cor-5), var(--cor-4), var(--cor-3));
+  background-attachment: fixed;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  width: 700px;
+  height: 700px;
+  background: var(--cor-1);
+  filter: blur(220px);
+  opacity: 0.28;
+  top: -250px;
+  left: -150px;
+  z-index: -1;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  width: 600px;
+  height: 600px;
+  background: var(--cor-2);
+  filter: blur(220px);
+  opacity: 0.22;
+  bottom: -250px;
+  right: -150px;
+  z-index: -1;
 }
 
 .tela-inicial {
@@ -25,7 +61,6 @@ body {
   align-items: center;
   justify-content: center;
   gap: 24px;
-  background-color: var(--cor-fundo);
   text-align: center;
   padding: 0 20px;
 }
@@ -33,19 +68,34 @@ body {
 .frase {
   font-size: 2rem;
   color: var(--cor-texto-claro);
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: -1px;
+  text-shadow: 0 0 25px rgba(32, 120, 207, 0.4);
 }
 
 .botao-comecar {
   padding: 12px 32px;
   font-size: 1rem;
-  border: 1px solid var(--cor-superficie-clara);
-  border-radius: 8px;
-  background-color: var(--cor-superficie);
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--cor-1), var(--cor-2));
   color: var(--cor-texto-claro);
   cursor: pointer;
+  transition: 0.25s;
 }
 
 .botao-comecar:hover {
-  background-color: var(--cor-superficie-clara);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(32, 120, 207, 0.45);
+}
+
+@media (max-width: 480px) {
+  .frase {
+    font-size: 1.5rem;
+  }
+
+  .botao-comecar {
+    padding: 12px 28px;
+    font-size: 0.95rem;
+  }
 }
